@@ -10,7 +10,7 @@ const firebaseConfig = {
     storageBucket: "fakexinside-b8ad6.appspot.com",
     messagingSenderId: "443928555879",
     appId: "1:443928555879:web:f5b88fd93b45efc362bfc2"
-};
+    };
 
 // Inicializa la aplicación de Firebase
 const app = initializeApp(firebaseConfig);
