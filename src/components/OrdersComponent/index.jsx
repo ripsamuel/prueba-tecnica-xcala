@@ -1,39 +1,43 @@
 import { useEffect } from "react";
 import { getOrders, getProductBySKU } from "../../API/api";
 
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import db from "../../firebase/firebaseConfig";
+
 export default function OrdersComponent() {
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const orders = await getOrders();
-        // console.log('productos -> ', products)
-
-        const validOrders = returnValidOrder(orders);
-
-        const productswSkuImg = [];
-        validOrders.forEach(async (o) => {
-          console.log('valid order ', o)
-          o.items.forEach(async (p) => {
-            const product = await getProductBySKU(p.item_product_sku);
-            console.log(`valid products ${o.order_number} `, product)
-            productswSkuImg.push(product);
-            console.log('arreglo con los productos y skuImg ', productswSkuImg)
-
-
-          })
-        });
-      } catch (error) {
-        console.error("Error al obtener los pedidos:", error);
-      }
-    };
-
-    fetchOrders();
-  }, []);
-
   // Resto del código de tu componente...
+
+  useEffect(() => {
+    fetchOrders()
+    .then((validOrders) => {
+      validOrders.forEach(o => saveOrder(o))
+    });
+  }, []);
 }
 
-function returnValidOrder(orders) {
+const fetchOrders = async () => {
+  try {
+    const orders = await getOrders();
+    
+    const validOrders = returnValidOrder(orders);
+    const productsSkuImg = [];
+
+    validOrders.forEach(async (o) => {
+      console.log('Orden valida  ', o)
+      o.items.forEach(async (p) => {
+        const product = await getProductBySKU(p.item_product_sku);
+        productsSkuImg.push(product);
+      })
+    });
+    console.log(`arreglo con los productos y skuimg `, productsSkuImg)
+    return validOrders;
+  } catch (error) {
+    console.error("Error al obtener los pedidos:", error);
+  }
+  
+};
+
+const returnValidOrder = (orders) => {
   const validOrders = [];
   orders.forEach((order) => {
     const { items, total_order_value, order_number } = order;
@@ -71,6 +75,25 @@ function returnValidOrder(orders) {
     }
   });
 
-  console.log("validOrders", validOrders);
+  console.log("Array con ordenes validas", validOrders);
+
   return validOrders;
+}
+
+const saveOrder = async (order) => {
+  try {
+    // Agrega la fecha y hora actual al pedido
+    const timestamp = serverTimestamp();
+    console.log('ordenes en saveorder',order)
+    // Guarda el pedido en Firestore con los datos originales, los datos calculados y el timestamp
+    await addDoc(collection(db, "ripsamuel_verified_orders"), {
+      ...order,
+      total_price_calculated: returnValidOrder(order),
+      verification_timestamp: timestamp,
+    });
+
+    console.log("Pedido guardado en Firestore");
+  } catch (error) {
+    console.error("Error al guardar el pedido en Firestore:", error);
+  }
 }
