@@ -1,19 +1,25 @@
+import React from "react";
 
-export default function ItemComponent({order}) {
+const ItemComponent = ({ order  }) => {
   return (
-    <section className="bg-red-100 grid grid-cols-1 ">
-        order_number: {order.order_number} <br />
-        total_order_value: {order.total_order_value} <br />
-        {order.items.map(i => (
-            <>
-              SKU: {i.item_product_sku}<br />
-              item_product_id: {i.item_product_id}<br />
-              item_value: {`$ ${i.item_value}`}<br />
-              <img className="w-20 h-20
-              " src={i.sku_img_src}></img>
-            </>
+    <section className="container mx-auto bg-red-100">
+      <div className="bg-blue-100 border-2 border-red-500">
+        <p>Numero de orden: {order.order_number}</p>
+        <p>Valor total de la orden: {order.total_order_value}</p>
+        {order.items.map((item) => (
+          <div className="" key={item.item_product_id}>
+            <p>SKU: {item.item_product_sku}</p>
+            <p>Fecha: {item.fetch_date}</p>
+            <p>Item Product ID: {item.item_product_id}</p>
+            <p>Item Value: ${item.item_value}</p>
+            <img className="w-20 h-20" src={item.sku_img_src} alt="SKU Image" />
+            {/* Agregar validaciones aquí */}
+          </div>
         ))}
-        <hr />
+      </div>
+      <hr />
     </section>
   );
-}
+};
+
+export default ItemComponent;

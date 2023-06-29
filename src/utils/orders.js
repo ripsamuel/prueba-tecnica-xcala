@@ -11,13 +11,13 @@ export const fetchOrders = async () => {
     const productsSkuImg = [];
 
     validOrders.forEach(async (o) => {
-      console.log("Orden valida  ", o);
       o.items.forEach(async (p) => {
         const product = await getProductBySKU(p.item_product_sku);
         productsSkuImg.push(product);
       });
     });
-    console.log(`arreglo con los productos y skuimg `, productsSkuImg);
+
+    console.log("Arreglo con los productos y SKUImg", productsSkuImg);
     return validOrders;
   } catch (error) {
     console.error("Error al obtener los pedidos:", error);
@@ -50,7 +50,7 @@ const returnValidOrder = (orders) => {
         item_product_sku < 0 // Verifica si item_product_sku es negativo
       ) {
         isValid = false;
-        console.log(`item ${order_number} con ID o SKU inválido`);
+        console.log(`Item ${order_number} con ID o SKU inválido`);
       } else {
         totalPrice += price;
       }
@@ -58,6 +58,8 @@ const returnValidOrder = (orders) => {
 
     // Verifica si la suma de los precios coincide con el total_order_value y todos los IDs y SKUs de productos son válidos
     if (isValid && totalPrice === total_order_value) {
+      // Agrega la propiedad "fetch_date" con la fecha actual en milisegundos
+      order.fetch_date = Date.now();
       validOrders.push(order);
     }
   });
@@ -66,6 +68,8 @@ const returnValidOrder = (orders) => {
 
   return validOrders;
 };
+
+
 
 const saveOrder = async (order) => {
   try {
