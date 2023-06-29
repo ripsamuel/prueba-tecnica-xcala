@@ -8,7 +8,7 @@ return (
 
       <AppLayout>
         <Button>
-            <NavLink to="./orders"> Ver Ordenes
+            <NavLink to="./VerifiedOrders"> Ver Ordenes
             </NavLink>
         </Button>
       </AppLayout>

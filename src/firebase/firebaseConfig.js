@@ -17,5 +17,6 @@ const app = initializeApp(firebaseConfig);
 
 // Obtiene una instancia de Firestore
 const db = getFirestore(app);
+console.log('base de datos', db)
 
 export default db;

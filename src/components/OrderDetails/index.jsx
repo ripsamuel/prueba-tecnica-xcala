@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const OrderDetails = ({ match }) => {
+const OrderDetails = ({ item }) => {
   console.log('match',match)
   const [order, setOrder] = useState(null);
 
@@ -33,6 +33,7 @@ const OrderDetails = ({ match }) => {
 
   useEffect(() => {
     fetchOrderDetails();
+    
   }, []);
 
   setTimeout(() => {
