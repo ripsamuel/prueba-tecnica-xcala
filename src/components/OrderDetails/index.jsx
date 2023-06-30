@@ -30,8 +30,8 @@ export default function OrderDetails() {
         console.error("Error al obtener los documentos:", error);
       }
     };
-
     fetchDataFromFirestore();
+
   }, [orderNumber]);
 
   const handleEnProceso = async () => {
@@ -70,11 +70,24 @@ export default function OrderDetails() {
       console.error("Error al actualizar el estado:", error);
     }
   };
-  console.log('detailfetch', detailFetch)
+  // console.log('detailfetch', detailFetch)
 
-  console.log(' detail fetch', detailFetch[0].items[0].item_product_id)
+  // console.log(' detail fetch', detailFetch[0].items[0].item_product_id)
 
 
+const renderView = () => {
+  if (detailFetch.length > 0) {
+    return (
+          <img
+              className="w-24 h-24 "
+              alt="sku img"
+              src={detailFetch[0].items[0].sku_img_src}
+          />
+    )
+  }else {
+    <p> recarga la pagina :(</p>
+  }
+}
   return (
     <div>
       <div>
@@ -85,11 +98,9 @@ export default function OrderDetails() {
           </div>
         
         <div className="flex justify-center m-10">
-          <img
-              className="w-24 h-24 "
-              alt="sku img"
-              src={detailFetch[0].items[0].sku_img_src}
-          />
+          {
+          renderView()
+          }
         </div>
       </div>
 
