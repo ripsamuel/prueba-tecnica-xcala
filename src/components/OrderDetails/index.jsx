@@ -24,6 +24,7 @@ export default function OrderDetails() {
         );
         const querySnapshot = await getDocs(q);
         const documentsData = querySnapshot.docs.map((doc) => doc.data());
+        console.log('docuemnts data',documentsData)
         setDetailFetch(documentsData);
       } catch (error) {
         console.error("Error al obtener los documentos:", error);
@@ -35,7 +36,7 @@ export default function OrderDetails() {
 
   const handleEnProceso = async () => {
     try {
-      const orderId = detailFetch[0].order_number; // Obtener el ID del pedido
+      const orderId = detailFetch[0].items[0].item_product_id; // Obtener el ID del pedido
       await updateDoc(doc(db, "samuel_orders_test", orderId), {
         en_proceso: true, // Actualizar el estado en_proceso a true
       });
@@ -48,7 +49,7 @@ export default function OrderDetails() {
   // console.log('order ide de detailfetch', detailFetch.items[0].item_product_id)
   const handleDespachado = async () => {
     try {
-      const orderId = detailFetch[0].order_number; // Obtener el ID del pedido
+      const orderId = detailFetch[0].items[0].item_product_id; // Obtener el ID del pedido
       await updateDoc(doc(db, "samuel_orders_test", orderId), {
         despachado: true, // Actualizar el estado despachado a true
       });
@@ -60,7 +61,7 @@ export default function OrderDetails() {
 
   const handleEntregado = async () => {
     try {
-      const orderId = detailFetch[0].order_number; // Obtener el ID del pedido
+      const orderId = detailFetch[0].items[0].item_product_id; // Obtener el ID del pedido
       await updateDoc(doc(db, "samuel_orders_test", orderId), {
         entregado: true, // Actualizar el estado entregado a true
       });
@@ -69,9 +70,9 @@ export default function OrderDetails() {
       console.error("Error al actualizar el estado:", error);
     }
   };
-  // console.log('asdasd', detailFetch)
+  console.log('detailfetch', detailFetch)
 
-  // console.log('aaa', detailFetch[0].items[0].sku_img_src)
+  console.log(' detail fetch', detailFetch[0].items[0].item_product_id)
 
 
   return (

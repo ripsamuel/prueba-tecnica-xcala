@@ -3,16 +3,17 @@ import { getOrders, getProductBySKU } from "../API/api";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import db from "../firebase/firebaseConfig";
 
-
 export const fetchOrders = async () => {
   try {
     const orders = await getOrders();
 
     const validOrders = returnValidOrder(orders);
+    const productsSkuImg = [];
 
     validOrders.forEach(async (o) => {
       o.items.forEach(async (p) => {
         const product = await getProductBySKU(p.item_product_sku);
+        productsSkuImg.push(product);
       });
     });
 
@@ -99,14 +100,11 @@ const returnValidOrder = (orders) => {
     }
   }
 
-
   return validOrders;
 };
 
-
-
-
 // ...
+
 export const saveOrder = async (order) => {
   try {
     const timestamp = serverTimestamp();
