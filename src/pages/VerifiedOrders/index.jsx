@@ -1,35 +1,21 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-
 import { collection, getDocs } from "firebase/firestore";
 import db from "../../firebase/firebaseConfig";
-
 import ItemComponent from "../../components/ItemComponent";
 import OrdersComponent from "../../components/OrdersComponent";
 import { fetchOrders } from "../../utils/orders";
+import AppLayout from "../../components/AppLayout";
 
-export default function Orders() {
+function Orders() {
   const [orders, setOrders] = useState([]);
   const [visibleOrders, setVisibleOrders] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(4);
   const [isLoading, setIsLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState("desc");
-
   const [search, setSearch] = useState("");
-
   const [data, setData] = useState([]);
-
-  // Searched items/ Get products
-  const filteredItemsById = (visibleOrders, search) => {
-    return visibleOrders.filter((order) =>
-      order.order_number.toLowerCase().includes(search.toLowerCase())
-    );
-  };
-  console.log(
-    "items filtrados por ID",
-    filteredItemsById(visibleOrders, search)
-  );
 
   const containerRef = useRef(null);
 
@@ -39,27 +25,32 @@ export default function Orders() {
       setVisibleOrders(validOrders.slice(startIndex, endIndex + 1));
     });
 
-    const fetchData = async () => {
-      try {
-        const collectionRef = collection(db, "ripsamuel_verified_orders");
-        const querySnapshot = await getDocs(collectionRef);
-        const documentsData = querySnapshot.docs.map((doc) => doc.data());
-        setData(documentsData);
-      } catch (error) {
-        console.error("Error al obtener los documentos:", error);
-      }
-    };
-    fetchData();
-    console.log("datos del fetch", data);
-    
+    fetchDataFromFirestore();
   }, []);
 
   useEffect(() => {
     const filteredData = data.filter((item) =>
       item.order_number.toLowerCase().includes(search.toLowerCase())
-    );
-    setVisibleOrders(filteredData);
+      );
+     
+      const sortedData = filteredData.sort((a, b) => b.fetch_date - a.fetch_date);
+
+      setVisibleOrders(sortedData);
+
+  setVisibleOrders(filteredData);
+
   }, [data, search]);
+
+  const fetchDataFromFirestore = async () => {
+    try {
+      const collectionRef = collection(db, "ripsamuel_verified_orders");
+      const querySnapshot = await getDocs(collectionRef);
+      const documentsData = querySnapshot.docs.map((doc) => doc.data());
+      setData(documentsData);
+    } catch (error) {
+      console.error("Error al obtener los documentos:", error);
+    }
+  };
 
   const loadMoreOrders = useCallback(() => {
     if (!isLoading && endIndex < orders.length - 1) {
@@ -100,28 +91,30 @@ export default function Orders() {
     };
   }, [handleScroll]);
 
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+  };
+
   return (
-    <section className="bg-red-100 grid grid-cols-1">
+    <AppLayout>
+      <section className="bg-black  grid  rounded-2xl">
       <OrdersComponent />
       <div>
         <input
           type="text"
           placeholder="Busca tu producto"
-          className="rounded-lg border border-black w-80 p-4 mb-10 focus:outline-none"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          className="rounded-lg border border-black w-80 p-4 mb-10 mt-10 focus:outline-none"
+          onChange={handleSearchChange}
         />
       </div>
 
-      <div ref={containerRef}>
+      <div 
+      className=""
+      ref={containerRef}>
         {visibleOrders.map((item) => (
-          <Link
-            to={`/VerifiedOrders/${item.order_number}`}
+            <ItemComponent order={item} 
             key={item.id}
-            match={item.sku_img_src}
-          >
-            <ItemComponent order={item} />
-          </Link>
+            />
         ))}
 
         {isLoading && <p>Loading...</p>}
@@ -131,5 +124,8 @@ export default function Orders() {
         Invertir orden ({sortOrder === "desc" ? "ascendente" : "descendente"})
       </button>
     </section>
+    </AppLayout>
   );
 }
+
+export default Orders;

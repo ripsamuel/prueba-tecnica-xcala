@@ -9,12 +9,10 @@ export const fetchOrders = async () => {
     const orders = await getOrders();
 
     const validOrders = returnValidOrder(orders);
-    const productsSkuImg = [];
 
     validOrders.forEach(async (o) => {
       o.items.forEach(async (p) => {
         const product = await getProductBySKU(p.item_product_sku);
-        productsSkuImg.push(product);
       });
     });
 
@@ -111,14 +109,14 @@ const returnValidOrder = (orders) => {
 // ...
 export const saveOrder = async (order) => {
   try {
-    // Agrega la fecha y hora actual al pedido
     const timestamp = serverTimestamp();
-    // Guarda el pedido en Firestore con los datos originales, los datos calculados y el timestamp
-    await addDoc(collection(db, "ripsamuel_verified_orders"), {
-      ...order
-      ,
+    await addDoc(collection(db, "samuel_orders_test"), {
+      ...order,
       total_price_calculated: order,
       verification_timestamp: timestamp,
+      en_proceso: false,
+      despachado: false,
+      entregado: false,
     });
 
     console.log("Pedido guardado en Firestore");
@@ -126,6 +124,3 @@ export const saveOrder = async (order) => {
     console.error("Error al guardar el pedido en Firestore:", error);
   }
 };
-
-// Luego donde tenga`validOrders`, puedes llamar a la función `saveOrder` para guardar el pedido en Firestore
-
