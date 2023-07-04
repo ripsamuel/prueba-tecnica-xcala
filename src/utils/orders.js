@@ -14,6 +14,7 @@ export const fetchOrders = async () => {
       o.items.forEach(async (p) => {
         const product = await getProductBySKU(p.item_product_sku);
         productsSkuImg.push(product);
+        console.log('orden ',o )
       });
     });
 
@@ -109,12 +110,12 @@ export const saveOrder = async (order) => {
   try {
     const timestamp = serverTimestamp();
     await addDoc(collection(db, "samuel_orders_test"), {
-      ...order,
       total_price_calculated: order,
-      verification_timestamp: timestamp,
       en_proceso: false,
       despachado: false,
       entregado: false,
+      ...order,
+      verification_timestamp: timestamp,
     });
 
     console.log("Pedido guardado en Firestore");
