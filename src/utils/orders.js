@@ -109,7 +109,7 @@ const returnValidOrder = (orders) => {
 export const saveOrder = async (order) => {
   try {
     const timestamp = serverTimestamp();
-    await addDoc(collection(db, "samuel_orders_test"), {
+    await addDoc(collection(db, "samuel_orders_finally"), {
       total_price_calculated: order,
       en_proceso: false,
       despachado: false,

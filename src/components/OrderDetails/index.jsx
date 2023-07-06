@@ -11,12 +11,12 @@ import { useParams } from "react-router-dom";
 import db from "../../firebase/firebaseConfig";
 
 export default function OrderDetails() {
-  const [orderFetched, setOrderFetched] = useState(null);
+  const [orderFetched, setOrderFetched] = useState(undefined);
   const { orderNumber } = useParams();
 
   useEffect(() => {
     fetchDataFromFirestore();
-  }, [orderNumber]);
+  }, []);
 
   const fetchDataFromFirestore = async () => {
     try {
@@ -26,12 +26,16 @@ export default function OrderDetails() {
       const querySnapshot = await getDocs(q);
 
       querySnapshot.forEach((doc) => {
-        console.log("Document ID:", orderNumber);
-        console.log("Document data:", doc.data());
+        const orderFetch = []
+        orderFetch.push(doc.data())
+        console.log("Order :", orderFetch);
+        console.log('procesed', orderFetch.procesed)
       });
 
+      // se agrega el ID de firebase al documento
       const documentsData = querySnapshot.docs.map((doc) => ({
         documentID: doc.id,
+        procesed : '1',
         ...doc.data(),
       }));
       setOrderFetched(documentsData[0]);
@@ -54,32 +58,48 @@ export default function OrderDetails() {
 
   const updateEnProceso = async () => {
     updateOrder({
-      en_proceso: !orderFetched.en_proceso,
+      en_proceso: orderFetched.en_proceso = true,
+      procesed : 2
     });
+    alert(`tu orden esta En proceso :) refresca la pagina `)
   };
 
   const updateDespachado = async () => {
     updateOrder({
+    
       despachado: orderFetched.despachado = true,
+      procesed : 3
+
     });
+    alert(`tu orden esta En proceso :) refresca la pagina`)
+
   };
 
   const updateEntregado = async () => {
     updateOrder({
       entregado: orderFetched.entregado = true,
     });
+    alert(`tu orden esta En proceso :) refresca la pagina`)
+  
   };
 
   const renderView = () => {
+   
     if (orderFetched) {
-      return orderFetched?.items.map((i) => (
-        <img
-          key={i}
-          className="w-24 h-24 "
-          alt="sku img"
-          src={i?.sku_img_src}
-        />
-      ));
+      return (
+        <div>
+          {orderFetched?.items.map((i) => (
+          <img
+            key={i}
+            className="w-24 h-24 "
+            alt="sku img"
+            src={i?.sku_img_src}
+          />)
+          )}
+    
+      </div>
+
+        );
     } else {
       <p> recarga la pagina :(</p>;
     }
@@ -90,24 +110,31 @@ export default function OrderDetails() {
 
       <div>
       {(() => {
+      console.log('order -',orderFetched)
+
       if (orderFetched?.en_proceso || orderFetched?.entregado || orderFetched?.despchado) {
-        return <p>estado de la orden {
-          orderFetched?.entregado.toString()
-          }
-          </p>;
+        return <div>
+          <p>Estados de la orden :</p>
+          
+        
+          </div>;
       } else {
-        return <p>Si no se cumple la condición</p>;
+        return <p>Estados de la orden no inicilizados</p>;
       }
     })()}
       </div>
-      <button onClick={updateEnProceso}>
-        En Proceso: {orderFetched?.en_proceso}
+      <button onClick={updateEnProceso} disabled={false}>
+        En Proceso: 
+        <span>{orderFetched?.en_proceso.toString()}</span>
       </button>
-      <button onClick={updateDespachado}>
+
+      <button onClick={updateDespachado} disabled={orderFetched?.en_proceso === false} >
         Despachado: {orderFetched?.despachado}
+        <span>{orderFetched?.despachado.toString()}</span>
       </button>
-      <button onClick={updateEntregado}>
-        Entregado: {orderFetched?.despachado}
+      <button onClick={updateEntregado} disabled={orderFetched?.despachado === false}>
+        Entregado: {orderFetched?.entregado}
+        <span>{orderFetched?.entregado.toString()}</span>
       </button>
     </div>
   );
