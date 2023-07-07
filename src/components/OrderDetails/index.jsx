@@ -20,7 +20,7 @@ export default function OrderDetails() {
 
   const fetchDataFromFirestore = async () => {
     try {
-      const collectionRef = collection(db, "samuel_orders_test");
+      const collectionRef = collection(db, "test_#10");
       const q = query(collectionRef, where("order_number", "==", orderNumber));
 
       const querySnapshot = await getDocs(q);
@@ -46,7 +46,7 @@ export default function OrderDetails() {
 
   const updateOrder = async (newOrder) => {
     try {
-      const docRef = doc(db, "samuel_orders_test", orderFetched.documentID);
+      const docRef = doc(db, "test_#10", orderFetched.documentID);
       console.log("actualizando ", orderFetched.documentID, newOrder, docRef);
       const updated = await updateDoc(docRef, newOrder);
 

@@ -6,17 +6,15 @@ import db from "../firebase/firebaseConfig";
 export const fetchOrders = async () => {
   try {
     const orders = await getOrders();
-
     const validOrders = returnValidOrder(orders);
     const productsSkuImg = [];
 
-    validOrders.forEach(async (o) => {
-      o.items.forEach(async (p) => {
+    for (const o of validOrders) {
+      for (const p of o.items) {
         const product = await getProductBySKU(p.item_product_sku);
         productsSkuImg.push(product);
-        console.log('orden ',o )
-      });
-    });
+      }
+    }
 
     return validOrders;
   } catch (error) {
@@ -24,14 +22,13 @@ export const fetchOrders = async () => {
   }
 };
 
+
 const returnValidOrder = (orders) => {
   const validOrders = [];
 
-  if (typeof orders === "object" && orders !== null) {
     if (Array.isArray(orders)) {
       orders.forEach((order) => {
-        const { items, total_order_value, order_number } = order;
-
+        const { items, total_order_value } = order;
         let totalPrice = 0;
         let isValid = true;
 
@@ -61,12 +58,14 @@ const returnValidOrder = (orders) => {
         if (isValid && totalPrice === total_order_value) {
           order.fetch_date = Date.now();
           validOrders.push(order);
+          return validOrders
         }
       });
+      console.log('ordenes validadas', validOrders)
     } else {
       const ordersArray = Object.values(orders);
       ordersArray.forEach((order) => {
-        const { items, total_order_value, order_number } = order;
+        const { items, total_order_value } = order;
 
         let totalPrice = 0;
         let isValid = true;
@@ -94,12 +93,12 @@ const returnValidOrder = (orders) => {
         });
 
         if (isValid && totalPrice === total_order_value) {
+          console.log('validacion')
           order.fetch_date = Date.now();
           validOrders.push(order);
         }
       });
     }
-  }
 
   return validOrders;
 };
@@ -109,7 +108,7 @@ const returnValidOrder = (orders) => {
 export const saveOrder = async (order) => {
   try {
     const timestamp = serverTimestamp();
-    await addDoc(collection(db, "samuel_orders_finally"), {
+    await addDoc(collection(db, "test_#10"), {
       total_price_calculated: order,
       en_proceso: false,
       despachado: false,

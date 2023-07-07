@@ -3,7 +3,8 @@ import db from "../firebase/firebaseConfig"; // Importa tu archivo de configurac
 
 export async function getOrders() {
   const ordersRef = collection(db, "orders");
-  const querySnapshot = await getDocs(ordersRef);
+  const ordersRef2 = collection(db, "test_#10");
+  const querySnapshot = await getDocs(ordersRef2);
 
   const orders = [];
   querySnapshot.forEach((doc) => {
